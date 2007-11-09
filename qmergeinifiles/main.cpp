@@ -4,7 +4,17 @@
 #include <QFile>
 #include <QSettings>
 
+extern const char *__progname;
+
 static bool o_override = true;
+
+void usage()
+{
+    qDebug("Usage:");
+    qDebug("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]", __progname);
+    qDebug("Options:");
+    qDebug("  -n, --no-override    Don't override contents of previous file.\n");
+}
 
 void mergeSettingsKeys(QSettings &out, QSettings &in)
 {
@@ -13,7 +23,15 @@ void mergeSettingsKeys(QSettings &out, QSettings &in)
     while( it.hasNext() )
     {
 	QString key = it.next();
-	out.setValue(key, in.value(key));
+	bool override = true;
+	if( !o_override )
+	{
+	    if( out.contains(key) )
+		override = false;
+	}
+
+	if( override )
+	    out.setValue(key, in.value(key));
     }
 }
 
@@ -46,11 +64,12 @@ int main(int argc, char** argv)
 
     QCoreApplication app = QCoreApplication(argc, argv);
     QStringList arguments = app.arguments();
+    arguments.takeAt(0);
     QStringListIterator it(arguments);
     while( it.hasNext() )
     {
 	QString argument = it.next();
-	if(argument == "-n" && argument == "--no-override" )
+	if(argument == "-n" || argument == "--no-override" )
 	{
 	    o_override = false;
 	}
@@ -61,7 +80,6 @@ int main(int argc, char** argv)
     }
     if( files.size() > 2 )
     {
-	files.takeAt(0);
 	QString out_filename(files.takeAt(0));
 	QSettings out(out_filename, QSettings::IniFormat);
 	QStringListIterator fit(files);
@@ -76,10 +94,13 @@ int main(int argc, char** argv)
 	    }
 	    else
 	    {
-		qDebug("File %s not exist. Skipping.", qPrintable(in_filename));
+		qDebug("File \"%s\" not exist. Skipping.", qPrintable(in_filename));
 	    }
 	}
     }
     else
+    {
+	usage();
 	qFatal("Too few arguments.");
+    }
 }
