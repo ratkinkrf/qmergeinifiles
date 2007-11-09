@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	    files.append(argument);
 	}
     }
-    if( files.size() > 2 )
+    if( files.size() > 1 )
     {
 	QString out_filename(files.takeAt(0));
 	QSettings out(out_filename, QSettings::IniFormat);
