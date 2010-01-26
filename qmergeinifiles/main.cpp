@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 {
     QStringList files;
 
-    QCoreApplication app = QCoreApplication(argc, argv);
+    QCoreApplication app(argc, argv);
     QStringList arguments = app.arguments();
     arguments.takeAt(0);
     QStringListIterator it(arguments);
