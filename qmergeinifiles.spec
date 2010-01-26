@@ -1,6 +1,6 @@
 
 Name: qmergeinifiles
-Version: 0.0.1
+Version: 1.0.0
 Release: alt1
 
 
@@ -34,6 +34,9 @@ qmake-qt4 -spec default
 %_bindir/*
 
 %changelog
+* Tue Jan 26 2010 Sergey V Turchin <zerg@altlinux.org> 1.0.0-alt1
+- fix compile with new Qt
+
 * Fri Nov 09 2007 Sergey V Turchin <zerg at altlinux dot org> 0.0.1-alt1
 - initial specfile
 
