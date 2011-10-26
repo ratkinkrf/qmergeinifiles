@@ -1,6 +1,6 @@
 
 Name: qmergeinifiles
-Version: 1.0.0
+Version: 1.90.0
 Release: alt1
 
 
@@ -34,6 +34,9 @@ qmake-qt4 -spec default
 %_bindir/*
 
 %changelog
+* Wed Oct 26 2011 Sergey V Turchin <zerg@altlinux.org> 1.90.0-alt1
+- rewrite to merge without recoding text
+
 * Tue Jan 26 2010 Sergey V Turchin <zerg@altlinux.org> 1.0.0-alt1
 - fix compile with new Qt
 
