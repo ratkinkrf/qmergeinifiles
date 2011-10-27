@@ -2,13 +2,13 @@
 #include <QCoreApplication>
 #include <QStringList>
 #include <QFile>
-#include <QMap>
+#include <QHash>
 
 extern const char *__progname;
 
 static bool o_override = true;
 
-typedef QMap<QByteArray,QByteArray> SettingsData;
+typedef QHash<QByteArray,QByteArray> SettingsData;
 
 void usage()
 {
@@ -64,7 +64,7 @@ void writeIniFile(const QString &path, const SettingsData &settings_data)
 	for(int state = 0; state <= 1; state++)
 	{
 		QByteArray current_group;
-		QMapIterator<QByteArray,QByteArray> i_general(settings_data);
+		QHashIterator<QByteArray,QByteArray> i_general(settings_data);
 		while( i_general.hasNext() )
 		{
 		    i_general.next();
