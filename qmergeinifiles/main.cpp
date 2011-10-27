@@ -135,6 +135,7 @@ int main(int argc, char** argv)
     {
 	SettingsData settings;
 	QString out_filename(files.takeAt(0));
+	readIniFile(out_filename, settings);
 	QStringListIterator fit(files);
 	while( fit.hasNext() )
 	{
