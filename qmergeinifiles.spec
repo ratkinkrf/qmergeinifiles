@@ -1,6 +1,6 @@
 
 Name: qmergeinifiles
-Version: 1.90.0
+Version: 1.91.0
 Release: alt1
 
 
@@ -34,6 +34,9 @@ qmake-qt4 -spec default
 %_bindir/*
 
 %changelog
+* Thu Oct 27 2011 Sergey V Turchin <zerg@altlinux.org> 1.91.0-alt1
+- create General section only if exists according settings
+
 * Wed Oct 26 2011 Sergey V Turchin <zerg@altlinux.org> 1.90.0-alt1
 - rewrite to merge without recoding text
 
