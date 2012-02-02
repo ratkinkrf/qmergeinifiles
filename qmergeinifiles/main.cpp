@@ -27,6 +27,9 @@ typedef QHash<QByteArray,QByteArray> SettingsData;
 
 void usage()
 {
+    qDebug("");
+    qDebug("%s -- Utility to merge INI-format files", __progname);
+    qDebug("(C) 2007-2012, Sergey V Turchin <zerg@altlinux.org>");
     qDebug("Usage:");
     qDebug("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]", __progname);
     qDebug("Options:");
