@@ -190,7 +190,6 @@ int main(int argc, char** argv)
 	while( fit.hasNext() )
 	{
 	    QString in_filename = fit.next();
-	    QFile in_file(in_filename);
 	    readIniFile(in_filename, settings);
 	}
 	writeIniFile(out_filename, settings);
