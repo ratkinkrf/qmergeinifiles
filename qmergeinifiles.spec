@@ -1,7 +1,7 @@
 
 Name: qmergeinifiles
-Version: 1.91.0
-Release: alt0.M60P.1
+Version: 2.0.0
+Release: alt1
 
 
 Summary: Utility to merge INI-format files
@@ -34,6 +34,9 @@ qmake-qt4 -spec default
 %_bindir/*
 
 %changelog
+* Fri Feb 10 2012 Sergey V Turchin <zerg@altlinux.org> 2.0.0-alt1
+- new version
+
 * Fri Oct 28 2011 Sergey V Turchin <zerg@altlinux.org> 1.91.0-alt0.M60P.1
 - built for M60P
 
