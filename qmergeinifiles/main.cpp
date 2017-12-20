@@ -1,5 +1,5 @@
 /****************************************************************************************
- * Copyright (c) 2007-2012 Sergey V Turchin <zerg@altlinux.org>                             *
+ * Copyright (c) 2007-2017 Sergey V Turchin <zerg@altlinux.org>                             *
  *                                                                                      *
  * This program is free software; you can redistribute it and/or modify it under        *
  * the terms of the GNU General Public License as published by the Free Software        *
@@ -27,7 +27,6 @@ typedef QHash<QByteArray,QByteArray> SettingsData;
 
 void usage()
 {
-    qDebug("");
     qDebug("%s -- Utility to merge INI-format files", __progname);
     qDebug("(C) 2007-2012, Sergey V Turchin <zerg@altlinux.org>");
     qDebug("Usage:");

@@ -11,7 +11,7 @@ UI_DIR = .uic
 target.path = /usr/bin/
 INSTALLS += target
 
-QMAKE_CFLAGS = -g -O0 -pedantic $(CUSTOM_OPT_FLAGS)
-QMAKE_CXXFLAGS = -g -O0 -pedantic $(CUSTOM_OPT_FLAGS)
+QMAKE_CFLAGS += -pedantic $(CUSTOM_OPT_FLAGS)
+QMAKE_CXXFLAGS += -pedantic $(CUSTOM_OPT_FLAGS)
 
 SOURCES = main.cpp
