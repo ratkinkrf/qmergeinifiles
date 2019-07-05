@@ -27,12 +27,12 @@ typedef QHash<QByteArray,QByteArray> SettingsData;
 
 void usage()
 {
-    qDebug("%s -- Utility to merge INI-format files", __progname);
-    qDebug("(C) 2007-2012, Sergey V Turchin <zerg@altlinux.org>");
-    qDebug("Usage:");
-    qDebug("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]", __progname);
-    qDebug("Options:");
-    qDebug("  -n, --no-override    Don't override contents of previous file.\n");
+    qWarning("%s -- Utility to merge INI-format files", __progname);
+    qWarning("(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>");
+    qWarning("Usage:");
+    qWarning("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]", __progname);
+    qWarning("Options:");
+    qWarning("  -n, --no-override    Don't override contents of previous file.\n");
 }
 
 void readIniFile(const QString &path, SettingsData &settings_data)
