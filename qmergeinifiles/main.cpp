@@ -14,53 +14,88 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
 
-#include <QCoreApplication>
-#include <QStringList>
-#include <QFile>
-#include <QHash>
+#include <unordered_map>
+#include <vector>
+#include <iterator>
+#include <string>
+#include <fstream>
+#include <algorithm>
 
 extern const char *__progname;
 
 static bool o_override = true;
 
-typedef QHash<QByteArray,QByteArray> SettingsData;
+typedef std::unordered_map<std::string, std::string> SettingsData;
 
 void usage()
 {
-    qWarning("%s -- Utility to merge INI-format files", __progname);
-    qWarning("(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>");
-    qWarning("Usage:");
-    qWarning("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]", __progname);
-    qWarning("Options:");
-    qWarning("  -n, --no-override    Don't override contents of previous file.\n");
+    fprintf(stderr, "%s -- Utility to merge INI-format files\n", __progname);
+    fprintf(stderr, "(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>\n");
+    fprintf(stderr, "(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>\n");("Usage:");
+    fprintf(stderr, "  %s [options] out.ini in1.ini [in2.ini in3.ini ...]\n", __progname);
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  -n, --no-override    Don't override contents of previous file.\n");
 }
 
-void readIniFile(const QString &path, SettingsData &settings_data)
+// trim from start (in place)
+static inline void ltrim(std::string &s)
 {
-    QByteArray current_group("General");
-    QFile f(path);
-    if( f.open(QIODevice::ReadOnly) )
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s)
+{
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s)
+{
+	rtrim(s);
+	ltrim(s);
+}
+
+// trim from both ends (copying)
+static inline std::string trim_copy(std::string s)
+{
+	trim(s);
+	return s;
+}
+
+void readIniFile(const std::string &path, SettingsData &settings_data)
+{
+    std::string current_group("General");
+    std::fstream f;
+	f.open(path, std::ios_base::in);
+    if( f.is_open() )
     {
-	while( !f.atEnd() )
+	while( !f.eof() )
 	{
-	    QByteArray ln = f.readLine().trimmed();
-	    if( ln.startsWith('[') )
+	    std::string ln;
+		std::getline(f, ln);
+		trim(ln);
+	    if( ln.front() == '[' )
 	    {
-		int idx_end = ln.indexOf(']');
+		int idx_end = ln.find(']');
 		if( idx_end > 0 )
-		    current_group = ln.mid(1,idx_end - 1).trimmed();
+		    current_group = trim_copy(ln.substr(1, idx_end - 1));
 		else
 		    continue;
 	    }
 	    else
 	    {
-		int idx_delim = ln.indexOf('=');
+		int idx_delim = ln.find('=');
 		if( idx_delim > 0 )
 		{
-		    QByteArray key = ln.mid(0,idx_delim).trimmed();
-		    key.prepend('/');
-		    key.prepend(current_group);
-		    QByteArray value = ln.mid(idx_delim + 1).trimmed();
+		    std::string key = trim_copy(ln.substr(0, idx_delim));
+		    key.insert(0, 1, '/');
+		    key.insert(0, current_group);
+		    std::string value = trim_copy(ln.substr(idx_delim + 1));
 		    if( o_override || !settings_data.contains(key) )
 			settings_data[key] = value;
 		}
@@ -72,34 +107,36 @@ void readIniFile(const QString &path, SettingsData &settings_data)
     }
 }
 
-void writeIniFile(const QString &path, SettingsData &settings_data)
+void writeIniFile(const std::string &path, SettingsData &settings_data)
 {
-    QFile f(path);
-    if( f.open(QIODevice::WriteOnly|QIODevice::Truncate) )
+    std::fstream f;
+	f.open(path, std::ios_base::out | std::ios_base::trunc);
+    if( f.is_open() )
     {
 
 	// collect General
-	QHash<QByteArray,QByteArray> general_settings;
-	QHashIterator<QByteArray,QByteArray> i_settings(settings_data);
-	while( i_settings.hasNext() )
+	std::unordered_map<std::string, std::string> general_settings;
+	auto i_settings(settings_data.begin());
+	while( i_settings != settings_data.end() )
 	{
-	    i_settings.next();
-	    QByteArray key_data = i_settings.key();
-	    int idx_delim = key_data.indexOf('/');
+	    std::string key_data = i_settings->first;
+	    int idx_delim = key_data.find('/');
 	    if( idx_delim > 0 )
 	    {
-		QByteArray group = key_data.mid(0,idx_delim);
-		QByteArray key = key_data.mid(idx_delim+1);
-		QByteArray value = i_settings.value();
-		QByteArray newline;
+		std::string group = key_data.substr(0, idx_delim);
+		std::string key = key_data.substr(idx_delim + 1);
+		std::string value = i_settings->second;
+		std::string newline;
 		newline.append(key);
-		newline.append('=');
+		newline.append(1, '=');
 		newline.append(value);
-		newline.append('\n');
+		newline.append(1, '\n');
 		if( group == "General" )
 		{
 		    general_settings[key] = value;
-		    settings_data.remove(key_data);
+			++i_settings;
+		    settings_data.erase(key_data);
+			continue;
 		}
 	    }
 	    else
@@ -108,94 +145,94 @@ void writeIniFile(const QString &path, SettingsData &settings_data)
 	// write General
 	if( general_settings.size() > 0 )
 	{
-	    f.write("[General]\n");
-	    QHashIterator<QByteArray,QByteArray> i_general(general_settings);
-	    while( i_general.hasNext() )
+	    f.write("[General]\n", 10);
+	    auto i_general(general_settings.begin());
+	    while( i_general != general_settings.end() )
 	    {
-		i_general.next();
-		QByteArray newline;
-		newline.append(i_general.key());
-		newline.append('=');
-		newline.append(i_general.value());
-		newline.append('\n');
-		f.write(newline);
+		std::string newline;
+		newline.append(i_general->first);
+		newline.append(1, '=');
+		newline.append(i_general->second);
+		newline.append(1, '\n');
+		f.write(newline.data(), newline.size());
+		++i_general;
 	    }
 	}
 	// write other settings
 	if( settings_data.size() > 0 )
 	{
-	    QByteArray current_group;
-	    QHashIterator<QByteArray,QByteArray> i_settings(settings_data);
-	    while( i_settings.hasNext() )
+	    std::string current_group;
+	    auto i_settings2(settings_data.begin());
+	    while( i_settings2 != settings_data.end() )
 	    {
-		i_settings.next();
-		QByteArray key_data = i_settings.key();
-		int idx_delim = key_data.indexOf('/');
+		std::string key_data = i_settings2->first;
+		int idx_delim = key_data.find('/');
 		if( idx_delim > 0 )
 		{
-			QByteArray newline;
-			QByteArray group = key_data.mid(0,idx_delim);
-			QByteArray key = key_data.mid(idx_delim+1);
-			QByteArray value = i_settings.value();
+			std::string newline;
+			std::string group = key_data.substr(0, idx_delim);
+			std::string key = key_data.substr(idx_delim + 1);
+			std::string value = i_settings2->second;
 			if( current_group != group )
 			{
 			    current_group = group;
-			    QByteArray groupline;
+			    std::string groupline;
 			    groupline.append("\n[");
 			    groupline.append(current_group);
 			    groupline.append("]\n");
-			    f.write(groupline);
+			    f.write(groupline.data(), groupline.size());
 			}
 			newline.append(key);
-			newline.append('=');
+			newline.append(1, '=');
 			newline.append(value);
-			newline.append('\n');
-			f.write(newline);
+			newline.append(1, '\n');
+			f.write(newline.data(), newline.size());
 		}
+		++i_settings2;
 	    }
 	}
 	f.close();
     }
     else
-	qDebug("Unable to open file \"%s\" for writing.", qPrintable(path));
+	fprintf(stderr, "Unable to open file  %s for writing.\n", path.data());
 }
 
 int main(int argc, char** argv)
 {
-    QStringList files;
+    std::vector<std::string> files;
 
-    QCoreApplication app(argc, argv);
-    QStringList arguments = app.arguments();
-    arguments.takeAt(0);
-    QStringListIterator it(arguments);
-    while( it.hasNext() )
+    std::vector<std::string> arguments(argv + 1, argv + argc);
+    auto it(arguments.begin());
+    while( it != arguments.end() )
     {
-	QString argument = it.next();
+	std::string argument = *it;
 	if(argument == "-n" || argument == "--no-override" )
 	{
 	    o_override = false;
 	}
 	else
 	{
-	    files.append(argument);
+	    files.push_back(argument);
 	}
+	++it;
     }
     if( files.size() > 1 )
     {
 	SettingsData settings;
-	QString out_filename(files.takeAt(0));
+	std::string out_filename(files.at(0));
 	readIniFile(out_filename, settings);
-	QStringListIterator fit(files);
-	while( fit.hasNext() )
+	auto fit(files.begin());
+	while( fit != files.end() )
 	{
-	    QString in_filename = fit.next();
+	    std::string in_filename = *fit;
 	    readIniFile(in_filename, settings);
+		++fit;
 	}
 	writeIniFile(out_filename, settings);
     }
     else
     {
 	usage();
-	qFatal("Too few arguments.");
+	fprintf(stderr, "Too few arguments.\n");
     }
 }
