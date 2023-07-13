@@ -21,11 +21,11 @@ Utility to merge INI-format files
 %prep
 
 %build
-%cmake
-%cmake_build
+%make
+%make_build
 
 %install
-%cmake_install
+%makeinstall_std
 
 
 %files
