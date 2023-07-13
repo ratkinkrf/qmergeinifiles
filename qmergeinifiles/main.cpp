@@ -28,12 +28,12 @@ static bool o_override = true;
 typedef std::unordered_map<std::string,std::string> SettingsData;
 void usage()
 {
-    printf("%s -- Utility to merge INI-format files\n", __progname);
-    printf("(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>\n");
-    printf("Usage:\n");
-    printf("  %s [options] out.ini in1.ini [in2.ini in3.ini ...]\n", __progname);
-    printf("Options:\n");
-    printf("  -n, --no-override    Don't override contents of previous file.\n");
+    fprintf(stderr,"%s -- Utility to merge INI-format files\n", __progname);
+    fprintf(stderr,"(C) 2007-2019, Sergey V Turchin <zerg@altlinux.org>\n");
+    fprintf(stderr,"Usage:\n");
+    fprintf(stderr,"  %s [options] out.ini in1.ini [in2.ini in3.ini ...]\n", __progname);
+    fprintf(stderr,"Options:\n");
+    fprintf(stderr,"  -n, --no-override    Don't override contents of previous file.\n");
 }
 
 // trim from start (in place)
@@ -74,7 +74,7 @@ void readIniFile(const std::string &path, SettingsData &settings_data)
             std::string ln;
             std::getline(f,ln);
             trim(ln);
-            if( *ln.begin() == ('[') )
+            if( ln.front()== '[' )
             {
                 int idx_end = ln.find(']');
                 if( idx_end > 0 )
@@ -189,7 +189,7 @@ void writeIniFile(const std::string &path, SettingsData &settings_data)
         f.close();
     }
     else
-        printf("Unable to open file  %s for writing.", path.data());
+        fprintf(stderr,"Unable to open file  %s for writing.\n", path.data());
 }
 
 int main(int argc, char** argv)
@@ -228,6 +228,6 @@ int main(int argc, char** argv)
     else
     {
         usage();
-        printf("Too few arguments.");
+        fprintf(stderr,"Too few arguments.\n");
     }
 }
