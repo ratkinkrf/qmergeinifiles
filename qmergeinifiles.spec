@@ -10,21 +10,22 @@ License: GPL
 
 Source: %name-%version.tar
 
-BuildRequires: qt5-base-devel
+
+BuildRequires(pre): rpm-macros-cmake
+BuildRequires:cmake gcc-c++
 
 %description
 Utility to merge INI-format files
 
 
 %prep
-%setup -q
-%qmake_qt5
 
 %build
-%make_build
+%cmake
+%cmake_build
 
 %install
-%installqt5
+%cmake_install
 
 
 %files
