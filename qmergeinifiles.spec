@@ -10,7 +10,7 @@ License: GPL
 
 Source: %name-%version.tar
 
-BuildRequires: qt5-base-devel
+BuildRequires:make gcc-c++
 
 %description
 Utility to merge INI-format files
@@ -18,13 +18,12 @@ Utility to merge INI-format files
 
 %prep
 %setup -q
-%qmake_qt5
 
 %build
-%make_build
+%make
 
 %install
-%installqt5
+%makeinstall_std
 
 
 %files
@@ -60,4 +59,3 @@ Utility to merge INI-format files
 
 * Fri Nov 09 2007 Sergey V Turchin <zerg at altlinux dot org> 0.0.1-alt1
 - initial specfile
-
