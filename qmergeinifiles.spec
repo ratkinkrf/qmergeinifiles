@@ -10,17 +10,21 @@ License: GPL
 
 Source: %name-%version.tar
 
+
 BuildRequires:make gcc-c++
+
 
 %description
 Utility to merge INI-format files
 
 
 %prep
+
 %setup -q
 
 %build
 %make
+
 
 %install
 %makeinstall_std
